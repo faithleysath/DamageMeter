@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>DamageMeter</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>netcoreapp9.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="DamageMeter.localization.en.json" />
+    <None Remove="DamageMeter.localization.zhs.json" />
+    <None Remove="DamageMeter.icons.亡灵契约师.png" />
+    <None Remove="DamageMeter.icons.储君.png" />
+    <None Remove="DamageMeter.icons.故障机器人.png" />
+    <None Remove="DamageMeter.icons.铁甲战士.png" />
+    <None Remove="DamageMeter.icons.静默猎手.png" />
+    <EmbeddedResource Include="DamageMeter.localization.en.json" LogicalName="DamageMeter.localization.en.json" />
+    <EmbeddedResource Include="DamageMeter.localization.zhs.json" LogicalName="DamageMeter.localization.zhs.json" />
+    <EmbeddedResource Include="DamageMeter.icons.亡灵契约师.png" LogicalName="DamageMeter.icons.亡灵契约师.png" />
+    <EmbeddedResource Include="DamageMeter.icons.储君.png" LogicalName="DamageMeter.icons.储君.png" />
+    <EmbeddedResource Include="DamageMeter.icons.故障机器人.png" LogicalName="DamageMeter.icons.故障机器人.png" />
+    <EmbeddedResource Include="DamageMeter.icons.铁甲战士.png" LogicalName="DamageMeter.icons.铁甲战士.png" />
+    <EmbeddedResource Include="DamageMeter.icons.静默猎手.png" LogicalName="DamageMeter.icons.静默猎手.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="GodotSharp" />
+    <Reference Include="System.Runtime.InteropServices" />
+    <Reference Include="sts2" />
+    <Reference Include="0Harmony" />
+    <Reference Include="System.Collections" />
+    <Reference Include="System.Text.Json" />
+    <Reference Include="System.Console" />
+    <Reference Include="System.Linq" />
+    <Reference Include="System.Threading" />
+  </ItemGroup>
+</Project>

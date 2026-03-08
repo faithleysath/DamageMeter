@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>DamageMeter</AssemblyName>
+    <RootNamespace>DamageMeterRebuilt</RootNamespace>
+    <RuntimeModId>DamageMeter</RuntimeModId>
+    <GameAppDir Condition="'$(GameAppDir)' == ''">/Users/laysath/Library/Application Support/Steam/steamapps/common/Slay the Spire 2/SlayTheSpire2.app</GameAppDir>
+    <GameDataDir Condition="'$(GameDataDir)' == ''">$(GameAppDir)/Contents/Resources/data_sts2_macos_arm64</GameDataDir>
+    <ModLayoutDir>$(MSBuildProjectDirectory)/dist/$(RuntimeModId)</ModLayoutDir>
+    <GameModsDir Condition="'$(GameModsDir)' == ''">$(GameAppDir)/Contents/MacOS/mods/$(RuntimeModId)</GameModsDir>
+    <PackProjectDir>$(MSBuildProjectDirectory)/Packaging/GodotPackProject</PackProjectDir>
+    <PackOutputPath>$(ModLayoutDir)/$(RuntimeModId).pck</PackOutputPath>
+    <ModImagePath>$(MSBuildProjectDirectory)/Resources/mod_image.png</ModImagePath>
+    <ModImageImportPath>$(MSBuildProjectDirectory)/Resources/mod_image.png.import</ModImageImportPath>
+    <ModImageCtexPath>$(MSBuildProjectDirectory)/Resources/imported/mod_image.png-43b80ce458f4c387952d9e3d7794760b.ctex</ModImageCtexPath>
+    <EnLocalizationPath>$(MSBuildProjectDirectory)/Resources/localization/en.json</EnLocalizationPath>
+    <ZhLocalizationPath>$(MSBuildProjectDirectory)/Resources/localization/zhs.json</ZhLocalizationPath>
+    <GodotPackerPath Condition="'$(GodotPackerPath)' == '' and Exists('$(MSBuildProjectDirectory)/Packaging/tools/Godot.app/Contents/MacOS/Godot')">$(MSBuildProjectDirectory)/Packaging/tools/Godot.app/Contents/MacOS/Godot</GodotPackerPath>
+    <GodotPackerPath Condition="'$(GodotPackerPath)' == ''">godot</GodotPackerPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="sts2">
+      <HintPath>$(GameDataDir)/sts2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="GodotSharp">
+      <HintPath>$(GameDataDir)/GodotSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="mod_manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/localization/*.json"
+                      LogicalName="DamageMeterRebuilt.localization.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Resources/icons/*.png"
+                      LogicalName="DamageMeterRebuilt.icons.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="reference/**/*.cs" />
+    <None Remove="reference/**/*.cs" />
+  </ItemGroup>
+
+  <Target Name="BuildModLayout" AfterTargets="Build">
+    <MakeDir Directories="$(ModLayoutDir)" />
+    <Exec Command="&quot;$(GodotPackerPath)&quot; --headless --path &quot;$(PackProjectDir)&quot; --script &quot;$(PackProjectDir)/pack.gd&quot; -- &quot;$(PackOutputPath)&quot; &quot;$(MSBuildProjectDirectory)/mod_manifest.json&quot; &quot;$(ModImagePath)&quot; &quot;$(EnLocalizationPath)&quot; &quot;$(ZhLocalizationPath)&quot; &quot;$(ModImageImportPath)&quot; &quot;$(ModImageCtexPath)&quot;" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFolder="$(ModLayoutDir)" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/mod_manifest.json" DestinationFolder="$(ModLayoutDir)" />
+  </Target>
+
+  <Target Name="DeployModToGame" DependsOnTargets="Build">
+    <RemoveDir Directories="$(GameAppDir)/Contents/MacOS/mods/DamageMeterRebuilt" ContinueOnError="true" />
+    <MakeDir Directories="$(GameModsDir)" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).dll" DestinationFolder="$(GameModsDir)" />
+    <Copy SourceFiles="$(PackOutputPath)" DestinationFolder="$(GameModsDir)" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/mod_manifest.json" DestinationFolder="$(GameModsDir)" />
+  </Target>
+</Project>

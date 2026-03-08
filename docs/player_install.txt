@@ -1,0 +1,21 @@
+DamageMeter arm64 rebuild install notes
+
+This package is meant to replace the original runtime mod on macOS.
+
+Files expected in the target mod folder:
+- DamageMeter.dll
+- DamageMeter.pck
+- mod_manifest.json
+
+Install target on macOS:
+/Users/<your-user>/Library/Application Support/Steam/steamapps/common/Slay the Spire 2/SlayTheSpire2.app/Contents/MacOS/mods/DamageMeter
+
+Install steps:
+1. Quit the game.
+2. Remove or back up any existing mods/DamageMeter folder.
+3. Copy the packaged DamageMeter folder into mods/.
+4. Start the game and enable "Skada: Spire Edition" if needed.
+
+Notes:
+- This build keeps the original runtime mod identity for multiplayer/mod-list compatibility.
+- The implementation is the no-Harmony arm64-compatible rebuild, not the original Rosetta-dependent build.

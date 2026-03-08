@@ -1,0 +1,13 @@
+; Engine configuration file.
+; Minimal helper project used only to build a valid .pck for the mod loader.
+
+config_version=5
+
+[application]
+
+config/name="DamageMeterRebuiltPackHelper"
+run/main_scene=""
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
