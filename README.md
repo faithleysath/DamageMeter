@@ -29,13 +29,13 @@ On native Apple Silicon, its Harmony patch path reaches a detour implementation 
 
 ## Build Requirements
 
-- `.NET 9 SDK` matching [global.json](/Users/laysath/proj/DamageMeter/global.json)
+- `.NET 9 SDK` matching [global.json](./global.json)
 - `Godot 4.5.1`
 - local Slay the Spire 2 install for `sts2.dll` and `GodotSharp.dll`
 
 Important constraints:
 
-- the checked-in `GameAppDir` default inside [DamageMeterRebuilt.csproj](/Users/laysath/proj/DamageMeter/DamageMeterRebuilt.csproj) points to the original maintainer's local Mac path and is only a convenience default
+- the checked-in `GameAppDir` default inside [DamageMeterRebuilt.csproj](./DamageMeterRebuilt.csproj) points to the original maintainer's local Mac path and is only a convenience default
 - on any other machine, you should assume you must pass `GameAppDir`
 - if you are not targeting the native macOS `arm64` data folder, also pass `GameDataDir`
 - do not use `Godot 4.6+` for packing; the game runtime is `4.5.1`, and newer Godot versions can produce incompatible `.pck` files
@@ -49,7 +49,7 @@ MSBuild properties you may need to override:
 
 ## No-Context Quick Start
 
-1. Ensure `dotnet --version` resolves to an SDK compatible with [global.json](/Users/laysath/proj/DamageMeter/global.json).
+1. Ensure `dotnet --version` resolves to an SDK compatible with [global.json](./global.json).
 2. Ensure `Godot 4.5.1` is available either as `godot` in `PATH` or via `-p:GodotPackerPath=/path/to/Godot`.
 3. Find the local game install path.
 4. Build from the repository root with explicit properties if you are not on the original maintainer machine.
@@ -108,6 +108,9 @@ dotnet build DamageMeterRebuilt.csproj -t:DeployModToGame \
 
 - `docs/current_status.md`
 - `docs/maintainer_handoff.md`
+- `docs/sts2_modding_from_scratch.md`
+- `docs/reverse_engineering_workflow.md`
+- `docs/skills/deep-analysis/SKILL.md`
 - `docs/analysis_notes.md`
 - `docs/api_reference.md`
 
