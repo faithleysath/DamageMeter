@@ -29,30 +29,45 @@ On native Apple Silicon, its Harmony patch path reaches a detour implementation 
 
 ## Build Requirements
 
-- `.NET 9`
+- `.NET 9 SDK` matching [global.json](/Users/laysath/proj/DamageMeter/global.json)
 - `Godot 4.5.1`
 - local Slay the Spire 2 install for `sts2.dll` and `GodotSharp.dll`
 
-The project defaults to looking for the game here:
+Important constraints:
 
-`/Users/laysath/Library/Application Support/Steam/steamapps/common/Slay the Spire 2/SlayTheSpire2.app`
+- the checked-in `GameAppDir` default inside [DamageMeterRebuilt.csproj](/Users/laysath/proj/DamageMeter/DamageMeterRebuilt.csproj) points to the original maintainer's local Mac path and is only a convenience default
+- on any other machine, you should assume you must pass `GameAppDir`
+- if you are not targeting the native macOS `arm64` data folder, also pass `GameDataDir`
+- do not use `Godot 4.6+` for packing; the game runtime is `4.5.1`, and newer Godot versions can produce incompatible `.pck` files
 
-Override paths through MSBuild properties if needed:
+MSBuild properties you may need to override:
 
 - `GameAppDir`
 - `GameDataDir`
 - `GameModsDir`
 - `GodotPackerPath`
 
-## Build
+## No-Context Quick Start
+
+1. Ensure `dotnet --version` resolves to an SDK compatible with [global.json](/Users/laysath/proj/DamageMeter/global.json).
+2. Ensure `Godot 4.5.1` is available either as `godot` in `PATH` or via `-p:GodotPackerPath=/path/to/Godot`.
+3. Find the local game install path.
+4. Build from the repository root with explicit properties if you are not on the original maintainer machine.
+
+Example for macOS Apple Silicon:
 
 ```bash
-export DOTNET_ROOT=/opt/homebrew/opt/dotnet@9/libexec
-export PATH=/opt/homebrew/opt/dotnet@9/bin:$PATH
-dotnet build
+dotnet build DamageMeterRebuilt.csproj \
+  -p:GameAppDir="/path/to/SlayTheSpire2.app" \
+  -p:GameDataDir="/path/to/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64" \
+  -p:GodotPackerPath="/path/to/Godot.app/Contents/MacOS/Godot"
 ```
 
-Build output:
+If `dotnet` is already on `PATH`, no extra `DOTNET_ROOT` export is required.
+
+If you are on the original maintainer machine, plain `dotnet build` also works because the local game path is already embedded in the project file.
+
+Build outputs:
 
 - `bin/Debug/net9.0/DamageMeter.dll`
 - `dist/DamageMeter/DamageMeter.dll`
@@ -62,7 +77,10 @@ Build output:
 Deploy directly into the local game install:
 
 ```bash
-dotnet build -t:DeployModToGame
+dotnet build DamageMeterRebuilt.csproj -t:DeployModToGame \
+  -p:GameAppDir="/path/to/SlayTheSpire2.app" \
+  -p:GameDataDir="/path/to/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64" \
+  -p:GodotPackerPath="/path/to/Godot.app/Contents/MacOS/Godot"
 ```
 
 ## Project Layout
@@ -107,4 +125,11 @@ Supported keys:
 
 ## Packaging Notes
 
-This handoff package intentionally does not bundle a local `Godot.app` or Godot zip. The project can use any externally installed `Godot 4.5.1` via `GodotPackerPath` or the `godot` command in `PATH`.
+This repository intentionally does not bundle a local `Godot.app` or Godot zip. The project can use any externally installed `Godot 4.5.1` via `GodotPackerPath` or the `godot` command in `PATH`.
+
+The mod-list artwork is not just a raw `png`. Packaging also depends on:
+
+- `Resources/mod_image.png.import`
+- `Resources/imported/mod_image.png-43b80ce458f4c387952d9e3d7794760b.ctex`
+
+If a future maintainer replaces the mod artwork, they must preserve the Godot import chain or regenerate an equivalent one.

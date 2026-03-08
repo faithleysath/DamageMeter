@@ -8,13 +8,29 @@ Keep the rebuilt mod functionally aligned with the original `DamageMeter` while 
 
 The rebuild is not a Harmony port. It is a no-Harmony implementation built on public game APIs.
 
-Source identity and runtime identity are intentionally different:
+Repository identity, source identity, and runtime identity are intentionally different:
 
-- source project folder/namespace: `DamageMeterRebuilt/`
+- repository root: this repo
+- source namespace/project identity: `DamageMeterRebuilt`
 - packaged runtime identity: `DamageMeter`
 - deployed runtime files: `mods/DamageMeter/DamageMeter.dll`, `DamageMeter.pck`, `mod_manifest.json`
 
 This runtime alias exists to maximize compatibility with the original mod's multiplayer/mod-matching behavior.
+
+## Environment Bring-Up
+
+For a fresh machine or no-context AI handoff:
+
+1. Install a `.NET 9` SDK compatible with `global.json`.
+2. Install `Godot 4.5.1`.
+3. Find the local Slay the Spire 2 install.
+4. Build with explicit MSBuild properties unless you are on the original maintainer machine.
+
+Important:
+
+- the checked-in `GameAppDir` default in `DamageMeterRebuilt.csproj` is a local convenience path, not a portable default
+- the project currently assumes the native macOS `arm64` data directory unless `GameDataDir` is overridden
+- do not use `Godot 4.6+` for packing
 
 ## Core Technical Decision
 

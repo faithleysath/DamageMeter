@@ -14,7 +14,7 @@ The rebuilt mod avoids Harmony and uses the game's public APIs instead.
 
 ## Implemented So Far
 
-- .NET 9 project created at `DamageMeterRebuilt/`
+- .NET 9 project created around `DamageMeterRebuilt.csproj`
 - references wired to the game's `sts2.dll` and `GodotSharp.dll`
 - `mod_manifest.json` added
 - build target now emits the runtime package to `dist/DamageMeter/`
@@ -43,11 +43,10 @@ The rebuilt mod avoids Harmony and uses the game's public APIs instead.
   - `SummonedEntry`
   - `StarsModifiedEntry`
 - original-like in-game panel shell now exists as code-only Godot UI
-- hotkey handling now follows the original architecture more closely:
-  - a dedicated root-level input node
-  - `_UnhandledKeyInput` instead of overlay-local `_Input`
-  - `F7` toggle and `Escape` dashboard close
-  - rebuilt-only `F8` / `Shift+F8` / `F9` remain supported through the same global path
+- hotkey handling now uses a dedicated root-level input node with per-frame key-edge polling:
+  - avoids relying on overlay-local input dispatch
+  - avoids the unreliable `_UnhandledKeyInput` path observed in this game's macOS build
+  - supports `F7`, `F8`, `Shift+F8`, `F9`, and `Escape`
 - the main panel now mirrors the original mod structure more closely:
   - top row with `↺`, `≡`, `◀`, title button, `▶`
   - segment row with `◀`, segment label, `▶`
@@ -88,7 +87,6 @@ The rebuilt mod avoids Harmony and uses the game's public APIs instead.
   - reset position
 - `DPT` and `Overkill` categories were added to match the original category set
 - archived fights can now be revisited directly from the segment menu
-- overlay hotkey support exists in code, but macOS is currently not delivering those keys reliably in-game
 - overlay visibility and panel position are now persisted in `DamageMeterRebuilt_settings.json`
 - panel dragging is implemented for quick in-game layout testing
 - overlay now supports multiple views:
@@ -118,30 +116,40 @@ The rebuilt mod avoids Harmony and uses the game's public APIs instead.
 
 ## Build
 
-From `DamageMeterRebuilt/`:
+From the repository root:
 
 ```bash
-export DOTNET_ROOT=/opt/homebrew/opt/dotnet@9/libexec
-export PATH=/opt/homebrew/opt/dotnet@9/bin:$PATH
-dotnet build
+dotnet build DamageMeterRebuilt.csproj \
+  -p:GameAppDir="/path/to/SlayTheSpire2.app" \
+  -p:GameDataDir="/path/to/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64" \
+  -p:GodotPackerPath="/path/to/Godot.app/Contents/MacOS/Godot"
 ```
 
 Expected outputs:
 
-- `bin/Debug/net9.0/DamageMeterRebuilt.dll`
-- `dist/DamageMeterRebuilt/DamageMeterRebuilt.dll`
-- `dist/DamageMeterRebuilt/DamageMeterRebuilt.pck`
-- `dist/DamageMeterRebuilt/mod_manifest.json`
+- `bin/Debug/net9.0/DamageMeter.dll`
+- `dist/DamageMeter/DamageMeter.dll`
+- `dist/DamageMeter/DamageMeter.pck`
+- `dist/DamageMeter/mod_manifest.json`
 
 Optional direct deploy to the local game install:
 
 ```bash
-dotnet build -t:DeployModToGame
+dotnet build DamageMeterRebuilt.csproj -t:DeployModToGame \
+  -p:GameAppDir="/path/to/SlayTheSpire2.app" \
+  -p:GameDataDir="/path/to/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_arm64" \
+  -p:GodotPackerPath="/path/to/Godot.app/Contents/MacOS/Godot"
 ```
 
 Default deploy target:
 
-- `SlayTheSpire2.app/Contents/MacOS/mods/DamageMeterRebuilt/`
+- `SlayTheSpire2.app/Contents/MacOS/mods/DamageMeter/`
+
+Environment notes:
+
+- `global.json` pins the SDK line; if `dotnet` already works, no Homebrew-specific exports are required
+- the checked-in `GameAppDir` in the project file is the original maintainer's local Mac path and should usually be overridden on any other machine
+- `Godot 4.5.1` is required for pack generation; `4.6+` can produce incompatible `.pck` files
 
 ## Current Product Shape
 
@@ -170,7 +178,6 @@ Current input model:
 ## Next High-Value Work
 
 - validate stat attribution edge cases in multiplayer
-- improve or replace hotkey handling on macOS, since some function-key paths are still swallowed by the platform/game
 - continue optional post-clone extensions on top of the now-stable original-style UI
 
 ## Active Parity Fixes
@@ -187,10 +194,11 @@ The current parity pass has now addressed these original-vs-rebuilt differences:
 
 ## Remaining Known Differences
 
-- macOS hotkey delivery should now be re-tested after switching to the original-style root-level `_UnhandledKeyInput` path.
+- function-key usability on macOS can still depend on system keyboard settings even though the mod-side polling path is fixed.
 - the rebuilt UI still keeps a few convenience interactions that are not bug-for-bug identical to the original, such as opening menus from additional click targets.
 - multiplayer edge cases have not yet been re-validated in a live multiplayer session after the `NetId`/platform-name parity pass.
 - the new rebuilt-only categories are intentionally additive and therefore have no original-mod parity target.
+
 ## Runtime Packaging Identity
 
 As of 2026-03-08, the source project still lives under `DamageMeterRebuilt/`, but the packaged/deployed runtime identity intentionally matches the original mod for multiplayer compatibility:
@@ -204,5 +212,7 @@ As of 2026-03-08, the source project still lives under `DamageMeterRebuilt/`, bu
   - `version = 1.1.0`
 - pack contents now also include:
   - `res://DamageMeter/mod_image.png`
+  - `res://DamageMeter/mod_image.png.import`
+  - `res://.godot/imported/mod_image.png-43b80ce458f4c387952d9e3d7794760b.ctex`
   - `res://DamageMeter/localization/en.json`
   - `res://DamageMeter/localization/zhs.json`
